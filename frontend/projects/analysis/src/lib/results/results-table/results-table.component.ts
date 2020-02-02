@@ -26,7 +26,7 @@ import {DialogSize} from 'projects/dialog/src/lib/dialog-size';
 library.add(faCircleNotch, faQuestion, faCheckSquare, faExclamationTriangle, faExclamationCircle, faChartLine, faFileInvoice, faFileImport);
 
 @Component({
-  selector: 'lib-results-list',
+  selector: 'lib-results-table',
   templateUrl: './results-table.component.html',
   styleUrls: ['./results-table.component.scss'],
   providers: [GatlingResultService]

@@ -36,7 +36,7 @@ export class DebugEntriesTableComponent implements OnInit {
   readonly menuIcon = MENU_ICON;
   readonly compareIcon = new IconFa(faNotEqual, 'success');
 
-  dataSource: MatTableDataSource<DebugEntry>;
+  dataSource: MatTableDataSource<DebugEntry>  = new MatTableDataSource([]);
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
   constructor(public resultsList: ResultsTableService,
