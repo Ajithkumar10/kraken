@@ -1,4 +1,4 @@
-<lib-table-overlay [id]="'results'" [loading]="false" [dataSource]="dataSource" [noDataLabel]="'No Results.'"
+<lib-table-overlay [id]="'results'" [loading]="false" [dataSource]="dataSource" [selection]="results._selection" [noDataLabel]="'No Results.'"
                    class="mat-table-body-bg">
   <table mat-table [dataSource]="dataSource" class="mat-table-body-bg" matSort matSortActive="startDate"
          matSortDirection="desc">

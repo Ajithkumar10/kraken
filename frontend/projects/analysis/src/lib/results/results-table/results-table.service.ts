@@ -22,7 +22,7 @@ export class ResultsTableService extends StorageJsonService<Result> implements O
 
   public static readonly ID = 'results-table-selection';
 
-  private readonly _selection: SelectionModel<Result> = new SelectionModel(false);
+  public readonly _selection: SelectionModel<Result> = new SelectionModel(false);
   public readonly selectionChanged: EventEmitter<Result> = new EventEmitter();
 
   constructor(
