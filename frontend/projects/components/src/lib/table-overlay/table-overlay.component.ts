@@ -1,8 +1,9 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {MatTableDataSource} from '@angular/material';
 import {KeyBinding, KeyBindingsService} from 'projects/tools/src/lib/key-bindings.service';
 import {SelectionModel} from '@angular/cdk/collections';
 import * as _ from 'lodash';
+import {StorageNodeComponent} from 'projects/storage/src/lib/storage-tree/storage-node/storage-node.component';
 
 @Component({
   selector: 'lib-table-overlay',
@@ -18,6 +19,8 @@ export class TableOverlayComponent<T> implements OnInit, OnDestroy {
   @Input() noDataLabel: string;
   @Input() id: string;
   @Input() selection: SelectionModel<any>;
+
+  @ViewChildren(StorageNodeComponent) treeNodes: QueryList<StorageNodeComponent>;
 
   constructor(
     private keys: KeyBindingsService) {
@@ -40,11 +43,13 @@ export class TableOverlayComponent<T> implements OnInit, OnDestroy {
     // TODO le sort pose peut etre problème ?
     // le sort ne modifie pas l'ordre des données dans le data ? uniquement à l'affichage ?
     console.log('upSelection');
-    const nodes = this.dataSource.data;
+    const nodes = this.dataSource.datdata;
     nodes.forEach(node => {
       console.log('id : ' + node.id + 'desc : ' + node.description);
     });
     const last = _.last(this.selection.selected);
+    const elementTop = this.treeNodes.filter(item => this.treeControl._lastSelection.path === item.node.path)[0].ref.nativeElement.offsetTop;
+    this.treeNodes.find(item => last.path === item.node.path);
     const lastIndex = _.indexOf(nodes, last);
     console.log('upSelection lastIndex : ' + lastIndex);
     if (lastIndex > 0) {
