@@ -1,4 +1,4 @@
-<lib-table-overlay [id]="'debugs'"  [loading]="false" [dataSource]="dataSource" [noDataLabel]="'Please select a Debug result.'"
+<lib-table-overlay-selection [id]="'debugs'"  [loading]="false" [dataSource]="dataSource" [selection]="debugResult._selection" [noDataLabel]="'Please select a Debug result.'"
                    class="mat-table-body-bg">
   <table mat-table [dataSource]="dataSource" class="mat-table-body-bg" matSort matSortActive="date"
          matSortDirection="asc">
@@ -42,4 +42,4 @@
       Compare With
     </button>
   </lib-contextual-menu>
-</lib-table-overlay>
+</lib-table-overlay-selection>

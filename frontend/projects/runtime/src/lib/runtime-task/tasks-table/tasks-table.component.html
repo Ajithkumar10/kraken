@@ -1,4 +1,4 @@
-<lib-table-overlay [id]="'tasks'" [loading]="loading" [dataSource]="dataSource" [noDataLabel]="'No Tasks.'"
+<lib-table-overlay-selection [id]="'tasks'" [loading]="loading" [dataSource]="dataSource" [selection]="_selection" [noDataLabel]="'No Tasks.'"
                    class="mat-table-body-bg">
   <table mat-table [dataSource]="dataSource" matSort matSortActive="startDate" matSortDirection="desc">
     <ng-container matColumnDef="id">
@@ -68,4 +68,4 @@
         [ngClass]="{'mat-row-selected' : isSelected(row)}">
     </tr>
   </table>
-</lib-table-overlay>
+</lib-table-overlay-selection>
