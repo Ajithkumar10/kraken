@@ -4,6 +4,7 @@ import {KeyBinding, KeyBindingsService} from 'projects/tools/src/lib/key-binding
 import {SelectionModel} from '@angular/cdk/collections';
 import * as _ from 'lodash';
 import {TableOverlayComponent} from 'projects/components/src/lib/table-overlay/table-overlay.component';
+import {GuiToolsService} from 'projects/tools/src/lib/gui-tools.service';
 
 @Component({
   selector: 'lib-table-overlay-selection',
@@ -18,13 +19,13 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
   @Input() dataSource: MatTableDataSource<any>;
   @Input() noDataLabel: string;
   @Input() selection: SelectionModel<any>;
-  private DELTA_HEIGHT = 50;
 
   @ViewChild('scrollableTable', {static: false}) scrollableTable: ElementRef<HTMLElement>;
 
   constructor(
     private keys: KeyBindingsService,
-    private element: ElementRef) {
+    private element: ElementRef,
+    private guiTools: GuiToolsService) {
     super();
   }
 
@@ -45,7 +46,7 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
     const lastIndex = this.getLastIndex();
     if (lastIndex > 0) {
       this.selectOne(this.nodes[lastIndex - 1]);
-      this.scrollTo(this.scrollableTable, this.getSelectedElement.bind(this));
+      this.guiTools.scrollTo(this.scrollableTable, this.getSelectedElement.bind(this));
       return true;
     }
     return false;
@@ -55,7 +56,7 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
     const lastIndex = this.getLastIndex();
     if (lastIndex < this.nodes.length - 1) {
       this.selectOne(this.nodes[lastIndex + 1]);
-      this.scrollTo(this.scrollableTable, this.getSelectedElement.bind(this));
+      this.guiTools.scrollTo(this.scrollableTable, this.getSelectedElement.bind(this));
       return true;
     }
     return false;
@@ -80,23 +81,5 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
 
   private getSelectedElement(): Element {
     return this.element.nativeElement.getElementsByClassName('mat-row-selected')[0];
-  }
-
-  private scrollTo(scrollableElement: ElementRef<HTMLElement>, getElement: () => Element): void {
-    setTimeout(() => {
-      const element = getElement();
-      const scrollHeight = scrollableElement.nativeElement.offsetHeight;
-      const scrollTop = scrollableElement.nativeElement.getBoundingClientRect().top;
-      const scrollBottom = scrollTop + scrollHeight;
-      const elementTop = element.getBoundingClientRect().top;
-      const elementBottom = element.getBoundingClientRect().bottom;
-      const deltaBottom = scrollBottom - this.DELTA_HEIGHT - elementBottom;
-      const deltaTop = elementTop - (scrollTop + this.DELTA_HEIGHT);
-      if (deltaBottom < 0) {
-        scrollableElement.nativeElement.scrollTop += Math.abs(deltaBottom);
-      } else if (deltaTop < 0) {
-        scrollableElement.nativeElement.scrollTop -= Math.abs(deltaTop);
-      }
-    });
   }
 }

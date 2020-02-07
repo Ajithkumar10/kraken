@@ -50,6 +50,8 @@ export class ResultsTableService extends StorageJsonService<Result> implements O
   public init() {
     super.init(this.analysisConfiguration.analysisRootNode.path, 'result\\.json', 2);
 
+    this._selection.changed.subscribe(() => this.selectionChanged.emit(this.selection));
+
     // Init _selection on component load
     const defaultResult = this.localStorage.getItem(ResultsTableService.ID);
     if (defaultResult) {
@@ -102,10 +104,8 @@ export class ResultsTableService extends StorageJsonService<Result> implements O
   public set selection(result: Result) {
     if (result) {
       this._selection.select(result);
-      this.selectionChanged.emit(result);
     } else {
       this._selection.clear();
-      this.selectionChanged.emit();
     }
   }
 
