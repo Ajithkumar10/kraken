@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material';
 import {KeyBinding, KeyBindingsService} from 'projects/tools/src/lib/key-bindings.service';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -17,11 +17,14 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
   @Input() loading: boolean;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() noDataLabel: string;
-  @Input() id: string;
   @Input() selection: SelectionModel<any>;
+  private DELTA_HEIGHT = 50;
+
+  @ViewChild('scrollableTable', {static: false}) scrollableTable: ElementRef<HTMLElement>;
 
   constructor(
-    private keys: KeyBindingsService) {
+    private keys: KeyBindingsService,
+    private element: ElementRef) {
     super();
   }
 
@@ -42,7 +45,7 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
     const lastIndex = this.getLastIndex();
     if (lastIndex > 0) {
       this.selectOne(this.nodes[lastIndex - 1]);
-      // this.upScroll();
+      this.scrollTo(this.scrollableTable, this.getSelectedElement.bind(this));
       return true;
     }
     return false;
@@ -52,7 +55,7 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
     const lastIndex = this.getLastIndex();
     if (lastIndex < this.nodes.length - 1) {
       this.selectOne(this.nodes[lastIndex + 1]);
-      // this.downScroll();
+      this.scrollTo(this.scrollableTable, this.getSelectedElement.bind(this));
       return true;
     }
     return false;
@@ -73,5 +76,27 @@ export class TableOverlaySelectionComponent<T> extends TableOverlayComponent imp
   private selectOne(node: any) {
     this.selection.clear();
     this.selection.select(node);
+  }
+
+  private getSelectedElement(): Element {
+    return this.element.nativeElement.getElementsByClassName('mat-row-selected')[0];
+  }
+
+  private scrollTo(scrollableElement: ElementRef<HTMLElement>, getElement: () => Element): void {
+    setTimeout(() => {
+      const element = getElement();
+      const scrollHeight = scrollableElement.nativeElement.offsetHeight;
+      const scrollTop = scrollableElement.nativeElement.getBoundingClientRect().top;
+      const scrollBottom = scrollTop + scrollHeight;
+      const elementTop = element.getBoundingClientRect().top;
+      const elementBottom = element.getBoundingClientRect().bottom;
+      const deltaBottom = scrollBottom - this.DELTA_HEIGHT - elementBottom;
+      const deltaTop = elementTop - (scrollTop + this.DELTA_HEIGHT);
+      if (deltaBottom < 0) {
+        scrollableElement.nativeElement.scrollTop += Math.abs(deltaBottom);
+      } else if (deltaTop < 0) {
+        scrollableElement.nativeElement.scrollTop -= Math.abs(deltaTop);
+      }
+    });
   }
 }
