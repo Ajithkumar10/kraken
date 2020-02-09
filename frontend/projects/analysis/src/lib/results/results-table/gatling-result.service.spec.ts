@@ -80,7 +80,7 @@ describe('GatlingResultService', () => {
   it('should delete result', () => {
     dialogs.delete.and.returnValue(of(null));
     analysis.deleteTest.and.returnValue(of('testId'));
-    service.deleteResult(result).subscribe();
+    service.deleteResultWithPopup(result).subscribe();
     expect(dialogs.delete).toHaveBeenCalledWith('test result', [result.description]);
     expect(analysis.deleteTest).toHaveBeenCalledWith(result.id);
   });

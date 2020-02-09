@@ -1,4 +1,4 @@
-<lib-table-overlay-selection [id]="'results'" [loading]="false" [dataSource]="dataSource" [selection]="results._selection" [noDataLabel]="'No Results.'"
+<lib-table-overlay-selection [id]="ID" [loading]="false" [dataSource]="dataSource" [selection]="results._selection" [noDataLabel]="'No Results.'"
                    class="mat-table-body-bg">
   <table mat-table [dataSource]="dataSource" class="mat-table-body-bg" matSort matSortActive="startDate"
          matSortDirection="desc">
@@ -50,7 +50,7 @@
       Open Gatling Reports
     </button>
     <mat-divider></mat-divider>
-    <button mat-menu-item (click)="gatling.deleteResult(results.selection).subscribe()"
+    <button mat-menu-item (click)="gatling.deleteResultWithPopup(results.selection).subscribe()"
             [disabled]="!gatling.canDeleteResult(results.selection)">
       <lib-icon [icon]="deleteIcon"></lib-icon>
       Delete Result

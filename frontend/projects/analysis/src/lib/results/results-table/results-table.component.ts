@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {GatlingResultService} from 'projects/analysis/src/lib/results/results-table/gatling-result.service';
 import {Result} from 'projects/analysis/src/lib/entities/result';
 import {MatSort} from '@angular/material/sort';
@@ -17,10 +17,10 @@ import {ResultsTableService} from 'projects/analysis/src/lib/results/results-tab
 import {faFileImport} from '@fortawesome/free-solid-svg-icons/faFileImport';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import {ContextualMenuComponent} from 'projects/tree/src/lib/contextual-menu/contextual-menu.component';
-import {StorageNode} from 'projects/storage/src/lib/entities/storage-node';
 import {DialogService} from 'projects/dialog/src/lib/dialog.service';
 import {OpenGatlingReportsDialogComponent} from 'projects/analysis/src/lib/analysis-dialogs/open-gatling-reports-dialog/open-gatling-reports-dialog.component';
 import {DialogSize} from 'projects/dialog/src/lib/dialog-size';
+import {KeyBinding, KeyBindingsService} from 'projects/tools/src/lib/key-bindings.service';
 
 library.add(faCircleNotch, faQuestion, faCheckSquare, faExclamationTriangle, faExclamationCircle, faChartLine, faFileInvoice, faFileImport);
 
@@ -30,7 +30,9 @@ library.add(faCircleNotch, faQuestion, faCheckSquare, faExclamationTriangle, faE
   styleUrls: ['./results-table.component.scss'],
   providers: [GatlingResultService]
 })
-export class ResultsTableComponent implements OnInit {
+export class ResultsTableComponent implements OnInit, OnDestroy {
+
+  readonly ID = 'results';
 
   readonly displayedColumns: string[] = ['status', 'description', 'startDate', 'contextualMenu'];
   readonly chartIcon = new IconFa(faChartLine, 'primary');
@@ -57,13 +59,16 @@ export class ResultsTableComponent implements OnInit {
     }
   );
 
+  private keyBindings: KeyBinding[] = [];
+
   dataSource: MatTableDataSource<Result>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild('menu', {static: true}) menu: ContextualMenuComponent;
 
   constructor(public gatling: GatlingResultService,
               public results: ResultsTableService,
-              private dialogs: DialogService) {
+              private dialogs: DialogService,
+              private keys: KeyBindingsService) {
   }
 
   ngOnInit() {
@@ -72,6 +77,16 @@ export class ResultsTableComponent implements OnInit {
       this.dataSource = new MatTableDataSource(resultsList);
       this.dataSource.sort = this.sort;
     });
+    this.keyBindings.push(new KeyBinding(['Enter'], this.openGrafanaSelection.bind(this), this.ID));
+    this.keyBindings.push(new KeyBinding(['Delete'], this.deleteSelectionWithPopup.bind(this), this.ID));
+    this.keyBindings.push(new KeyBinding(['ctrl + Delete'], this.deleteSelection.bind(this), this.ID));
+    this.keyBindings.forEach(binding => {
+      this.keys.add([binding]);
+    });
+  }
+
+  ngOnDestroy() {
+    this.keyBindings.forEach(binding => this.keys.remove([binding]));
   }
 
   openMenu(event: MouseEvent) {
@@ -80,5 +95,23 @@ export class ResultsTableComponent implements OnInit {
 
   openGatlingReportsDialog(result: Result) {
     this.dialogs.open(OpenGatlingReportsDialogComponent, DialogSize.SIZE_SM, {result});
+  }
+
+  openGrafanaSelection() {
+    if (this.gatling.canOpenGrafanaReport(this.results.selection)) {
+      this.gatling.openGrafanaReport(this.results.selection);
+    }
+  }
+
+  deleteSelectionWithPopup() {
+    if (this.gatling.canDeleteResult(this.results.selection)) {
+      this.gatling.deleteResultWithPopup(this.results.selection).subscribe();
+    }
+  }
+
+  deleteSelection() {
+    if (this.gatling.canDeleteResult(this.results.selection)) {
+      this.gatling.deleteResult(this.results.selection).subscribe();
+    }
   }
 }
